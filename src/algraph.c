@@ -1,15 +1,13 @@
 //==============================================================================
-//                        MAIN []                   
+//                  ADJENCENCY LIST GRAPH ADT [implementation]                   
 //------------------------------------------------------------------------------
-// DESCRIPTION: Conatins the main function of the application.
+// DESCRIPTION: Using adjacency list to represent a graph.
 //------------------------------------------------------------------------------
 // AUTHOR: Renan Antunes Braga Bomtempo                    MATRICULA: 2018048524
 //==============================================================================
 #include <stdio.h>
 #include <stdlib.h>
+#include "algraph.h"
 
-int main(int argc, char const *argv[])
-{
-    
-    return 0;
-}
+
+
