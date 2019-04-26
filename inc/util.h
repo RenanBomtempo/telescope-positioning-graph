@@ -9,6 +9,11 @@
 #define UTIL_H
 
 /*
+ * Number of telescopes
+ */
+int g_num_telescopes;
+
+/*
  * Telescope Position - Latitude and Longitude values of a telescope.
  */
 typedef struct TelPos {   

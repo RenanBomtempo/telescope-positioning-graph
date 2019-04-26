@@ -15,7 +15,7 @@ int main(int argc, char const *argv[])
     // Check if data file name was passed as an argument
     if (argc < 2) 
     {
-         fprintf(stderr, "ERROR - No data file was passed as an argument\n");
+        fprintf(stderr, "ERROR - No data file was passed as an argument\n");
         exit(EXIT_FAILURE);
     }
 
@@ -27,8 +27,24 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
 
-    /* READ DATA */
+    // Read number of telescopes
+    fscanf(fp, "%d", &g_num_telescopes);
 
+    // Array of telescope positions
+    telpos *positions = (telpos*)malloc(g_num_telescopes * sizeof(telpos));
+    if (NULL == positions)
+    {
+        fprintf(stderr, "ERROR - Couldn't allocate memory for \'telpos\' array\n");
+        exit(EXIT_FAILURE);
+    }
+
+    //Read telescopes positions
+    for (int i = 0; i < g_num_telescopes; i++)
+    {
+        fscanf(fp, "%f %f", &positions[i].lat, &positions[i].lon);
+        /*log*/printf("Telescope %d:\n\tlat: %.5f\n\tlon: %.5f\n", i, positions[i].lat, positions[i].lon);
+    }
+    
     // Close data file
     fclose(fp);
 
@@ -38,5 +54,8 @@ int main(int argc, char const *argv[])
 
     /* PRINT LOWEST WEIGHT ON THE MST */
     
+    //Free array of positions
+    free(positions);
+
     return 0;    
 } 
