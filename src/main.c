@@ -31,42 +31,37 @@ int main(int argc, char const *argv[])
     fscanf(fp, "%d", &g_num_telescopes);
 
     // Array of telescope positions
-    telpos *positions = (telpos*)malloc(g_num_telescopes * sizeof(telpos));
-    if (NULL == positions) {
+    telpos *tel_positions = (telpos*)malloc(g_num_telescopes * sizeof(telpos));
+    if (NULL == tel_positions) {
         fprintf(stderr, "ERROR - Couldn't allocate memory for \'telpos\' array\n");
         exit(EXIT_FAILURE);
     }
 
     // Read telescopes positions
     for (int i = 0; i < g_num_telescopes; i++) {
-        fscanf(fp, "%f %f", &positions[i].lat, &positions[i].lon);
+        fscanf(fp, "%f %f", &tel_positions[i].lat, &tel_positions[i].lon);
         /*log*/printf("Telescope %d:\n"
                       "    lat: %.5f\n"
                       "    lon: %.5f\n",
-                      i, positions[i].lat,
-                         positions[i].lon);
+                      i, tel_positions[i].lat,
+                         tel_positions[i].lon);
     }
     
     // Close data file
     fclose(fp);
 
     /* CREATE K GRAPH */
-
-    edge *k_graph = createKGraphFromTelescopeData(positions);
-    /*log*/printGraph(k_graph, g_num_telescopes * (g_num_telescopes - 1)/2);
-    quickSortGraph(k_graph, 0,  (g_num_telescopes * (g_num_telescopes - 1)/2)-1);
-    printf("\nOrdered Graph\n");
-    /*log*/printGraph(k_graph, g_num_telescopes * (g_num_telescopes - 1)/2);
-
-    /* GENERATE MST */
+    edge **k_graph = createKGraph(g_num_telescopes, tel_positions);
+    printGraph(k_graph, g_num_telescopes);
+    /* GENERATE MBST */
 
     // Terminate K_graph
-    terminateGraph(k_graph);
+    terminateGraph(k_graph, g_num_telescopes);
 
     /* PRINT LOWEST WEIGHT ON THE MST */
     
     // Free array of positions
-    free(positions);
+    free(tel_positions);
     
     return 0;    
 } 

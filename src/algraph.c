@@ -10,115 +10,105 @@
 #include "algraph.h"
 #include "util.h"
 
-edge *newEmptyGraph(int n_edges)
-{
-    // Allocate memory
-    edge *graph = (edge*)malloc(n_edges * sizeof(edge));
-
-    // Check for allocation error
-    if (NULL == graph) 
-    {
-        fprintf(stderr, "ERROR - Couldn't allocate memory for graph\n");
-        exit(EXIT_FAILURE);
+edge **newEmptyGraph(int num_vertices) {
+    // Allocate memory for the array of vertices
+    edge **graph = (edge**)malloc(num_vertices * sizeof(edge*));
+    
+    for (int i = 0; i < num_vertices; i++) {
+        graph[i] = NULL;
     }
 
     return graph;
-}   
+}
 
-void terminateGraph(edge *graph)
-{
-    free(graph);
-}   
+edge **createKGraph(int num_vertices, telpos *tel_positions) {
+    edge **k_graph = newEmptyGraph(num_vertices);
 
-edge *createKGraphFromTelescopeData(telpos *positions) 
-{
-    // Number of edges in the K graph.
-    int num_edges = g_num_telescopes * (g_num_telescopes - 1)/2;
-    
-    // Counter for populating the graph.
-    int count = 0;
-
-    // Allocate memory
-    edge *k_graph = newEmptyGraph(num_edges);
-
-    // Fill in the K graph. 
-    for (int i = 0; i < g_num_telescopes; i++)
-    {
-        for (int j = i+1; j < g_num_telescopes; j++)
-        {
-            k_graph[count].vert_1 = i;
-            k_graph[count].vert_2 = j;
-            k_graph[count].weight = distEarthKm(positions[i].lat, positions[i].lon,
-                                                positions[j].lat, positions[j].lon);
-            count++;
+    for (int i = 0; i < num_vertices; i++){
+        for (int j = i+1; j < num_vertices; j++){
+            insertEdge(k_graph, i, j, distEarthKm(tel_positions[i].lat, tel_positions[i].lon,
+                                                  tel_positions[j].lat, tel_positions[j].lon));
         }
     }
 
     return k_graph;
-} 
+}
 
-void printGraph(edge *graph, int size)
-{
-    for (int i = 0; i < size; i++)
-    {
-        printf("Edge %d:\n"
-               "    vert_1: %d\n"
-               "    vert_2: %d\n"
-               "    weight: %d\n",
-               i, graph[i].vert_1,
-                  graph[i].vert_2,
-                  graph[i].weight);
+void insertEdge(edge **graph, int vert_1, int vert_2, int weight) {
+    printf("New edge (%d, %d) -> weight = %d\n", vert_1, vert_2, weight);
+    edge *new_edge, *ptr;
+    
+    // Insert edge (vert_1, vert_2)
+    // Allocate memory for a new edge
+    new_edge = (edge*)malloc(sizeof(edge));
+    if (new_edge == NULL) exit(EXIT_FAILURE);
+
+    // Set edge values using the passed parameters
+    new_edge->vert_ind = vert_2;
+    new_edge->weight = weight;
+    new_edge->next = NULL;
+
+    // Get pointer to vert_1
+    if (graph[vert_1] == NULL) graph[vert_1] = new_edge;
+    else {
+        ptr = graph[vert_1];
+
+        // Find last edge of vert_1
+        while (ptr->next != NULL) ptr = ptr->next;
+
+        // Insert edge in the vert_1 list
+        ptr->next = new_edge;
+    }
+
+    // Insert edge (vert_2, vert_1)
+    // Allocate memory for a new edge
+    new_edge = (edge*)malloc(sizeof(edge));
+    if (new_edge == NULL) exit(EXIT_FAILURE);
+
+    // Set edge values using the passed parameters
+    new_edge->vert_ind = vert_1;
+    new_edge->weight = weight;
+    new_edge->next = NULL;
+
+    // Get pointer to vert_2
+    if (graph[vert_2] == NULL) graph[vert_2] = new_edge;
+    else {
+        ptr = graph[vert_2];
+
+        // Find last edge of vert_2
+        while (ptr->next != NULL) ptr = ptr->next;
+
+        // Insert edge in the vert_2 list
+        ptr->next = new_edge;
     }
 }
 
-void quickSortGraph(edge *graph, int start, int end)
-{
-    if (start < end)
-    {
-        int part_index = partition(graph, start, end);
-
-        // Sort first partition
-        quickSortGraph(graph, start, part_index - 1);
-
-        // Sort second partition
-        quickSortGraph(graph, part_index + 1, end);
+void printGraph(edge **graph, int size) {
+    printf("PRINTING ADJACENCY LIST\n");
+    for (int i = 0; i < size; i++) {
+        printf("(%d)", i);
+        if (graph[i] != NULL) {
+            edge *ptr = graph[i];
+            do {
+                printf("->[%d,%d]", ptr->vert_ind, ptr->weight);
+                ptr = ptr->next;
+            }
+            while (ptr != NULL);
+            printf("\n");
+        }
     }
 }
 
-int partition(edge *graph, int start, int end)
-{
-    int pivot = graph[end].weight;
-    int i = start - 1;
-
-    for (int j = start; j <= end - 1; j++) 
-    { 
-        if (graph[j].weight <= pivot) 
-        { 
-            i++; 
-            swap(graph, i, j); 
-        } 
-    } 
-    swap(graph, i + 1, end); 
-
-    return (i + 1); 
-}
-
-void swap(edge *graph, int e1, int e2)
-{
-    int tmp;
-
-    // Swap vert_1
-    tmp = graph[e1].vert_1;
-    graph[e1].vert_1 = graph[e2].vert_1;
-    graph[e2].vert_1 = tmp;
-
-    // Swap vert_2
-    tmp = graph[e1].vert_2;
-    graph[e1].vert_2 = graph[e2].vert_2;
-    graph[e2].vert_2 = tmp;
-
-    // Swap weight
-    tmp = graph[e1].weight;
-    graph[e1].weight = graph[e2].weight;
-    graph[e2].weight = tmp;
+void terminateGraph(edge **graph, int size) {
+    edge *ptr, *tmp;
+    for (int i = 0; i < size; i++) {
+        ptr = graph[i];
+        while (ptr->next != NULL) {
+            tmp = ptr;
+            ptr = ptr->next;
+            free(tmp);
+        }
+        free(ptr);
+    }
+    free(graph);
 }

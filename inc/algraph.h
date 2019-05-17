@@ -1,7 +1,7 @@
 //==============================================================================
 //                              GRAPH ADT [header]                   
 //------------------------------------------------------------------------------
-// DESCRIPTION: Graph represented as an array of edges.
+// DESCRIPTION: In this file we represent a Graph
 //------------------------------------------------------------------------------
 // AUTHOR: Renan Antunes Braga Bomtempo                    MATRICULA: 2018048524
 //==============================================================================
@@ -9,62 +9,25 @@
 #define ALGRAPH_H 
 #include "util.h"
 
-/* 
- * Edge of a graph.
+/*
+ * Adjacency list representation of the graph 
  */
 typedef struct Edge {
-    // Index of first vertex of the edge.
-    int vert_1;
-    // Index of second vertex of the edge.
-    int vert_2;
-    // Weight of the edge.
-    int weight;    
+    // Connected vertex index
+    int vert_ind;
+    // Wheight of the edge between them
+    int weight;
+    // Next vertex on the  list
+    struct Edge *next;
 } edge;
 
 /*
  * Allocate memory for a set of edges that compose a graph.
  */
-edge *newEmptyGraph(int n_edges);
-
-/*
- * Create a graph given all telescopes positions.
- */
-edge *createKGraphFromTelescopeData(telpos *positions); 
-
-/*
- * Free all memory allocated for a graph.
- */
-void terminateGraph(edge *graph);
-
-/*
- * Generate the Minimum Spanning Tree associated with the given graph
- */
-edge *getMST(edge *graph, int size); 
-
-/*
- * Get the lowest edge weight in the graph.
- */
-int getLowestWeight(edge *graph, int size);
-
-/*
- * Print a graph for debugging purposes.
- */
-void printGraph(edge *graph, int size);
-
-/*
- * Sort the graph by the size of the edges.
- */
-void quickSortGraph(edge *graph, int start, int end);
-
-/*
- * Partition the graph for sorting.
- */
-int partition(edge *graph, int start, int end);
-
-/*
- * Swap two edges in a graph.
- */
-void swap(edge *graph, int e1, int e2);
-
+edge **newEmptyGraph(int num_vertices);
+edge **createKGraph(int num_vertices, telpos *tel_positions);
+void insertEdge(edge **graph, int vert_1, int vert_2, int weight);
+void printGraph(edge **graph, int size);
+void terminateGraph(edge **graph, int size);
 
 #endif // ALGRAPH_H  

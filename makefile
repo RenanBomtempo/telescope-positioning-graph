@@ -7,7 +7,7 @@ all: main clean
 
 # Main file
 main: algraph.o util.o
-	$(CC) src/main.c algraph.o util.o -o ./bin/tp2 $(CFLAGS)
+	$(CC) src/main.c algraph.o util.o -o ./tp2.out $(CFLAGS)
 
 # Compile object files
 algraph.o:
