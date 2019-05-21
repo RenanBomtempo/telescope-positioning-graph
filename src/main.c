@@ -13,7 +13,7 @@
 int main(int argc, char const *argv[])
 {
     /* READ FILE */
-
+    printf("\n==READING FILE==\n");
     // Check if data file name was passed as an argument
     if (argc < 2) {
         fprintf(stderr, "ERROR - No data file was passed as an argument\n");
@@ -46,17 +46,23 @@ int main(int argc, char const *argv[])
                       i, tel_positions[i].lat,
                          tel_positions[i].lon);
     }
-    
+
+    printf("==FINISHED READING FILE==\n");
+
     // Close data file
     fclose(fp);
 
     /* CREATE K GRAPH */
-    edge **k_graph = createKGraph(g_num_telescopes, tel_positions);
+    edge *edges = getEdgesFromTelescopeData(tel_positions);
+    graph k_graph = createGraphFromTelescopeData(g_num_telescopes, edges);
     printGraph(k_graph, g_num_telescopes);
+    getEdgeArrayFromGraph(k_graph, g_num_telescopes);
+    
     /* GENERATE MBST */
 
     // Terminate K_graph
-    terminateGraph(k_graph, g_num_telescopes);
+    
+    terminateGraph(k_graph, g_num_telescopes, edges);
 
     /* PRINT LOWEST WEIGHT ON THE MST */
     
